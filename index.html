@@ -216,6 +216,12 @@
             transform: translateY(-3px);
             box-shadow: 0 15px 25px rgba(2, 132, 199, 0.3);
         }
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
 
         /* --- Skills & Certifications --- */
         .skills-grid {
@@ -573,6 +579,40 @@
             margin-bottom: 1.5rem;
         }
 
+        /* --- Toast Notification System --- */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: #16a34a; /* Professional Green Success Color */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+
         /* Animations */
         .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
@@ -592,6 +632,8 @@
     </style>
 </head>
 <body>
+
+    <div id="toast-container"></div>
 
     <nav id="navbar">
         <a href="#" class="logo">A. Asif</a>
@@ -878,11 +920,9 @@
                 </div>
             </div>
 
-            <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
-                
+            <form class="contact-form ajax-form" action="https://api.web3forms.com/submit" method="POST">
                 <input type="hidden" name="access_key" value="a2ecb2a9-247a-415b-8cc1-67b291116fd3">
-                
-                <div class="form-row">
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;"> <div class="form-row">
                     <div class="form-group">
                         <label for="name">Full Name</label>
                         <input type="text" id="name" name="name" class="form-control" required placeholder="John Doe">
@@ -916,12 +956,9 @@
             <h3>Request My Resume</h3>
             <p>Enter your email below, and I will send you a copy of my latest resume directly.</p>
             
-            <form action="https://api.web3forms.com/submit" method="POST">
-                
+            <form class="ajax-form" action="https://api.web3forms.com/submit" method="POST">
                 <input type="hidden" name="access_key" value="a2ecb2a9-247a-415b-8cc1-67b291116fd3">
-                
-                <input type="hidden" name="subject" value="New Resume Request from Portfolio">
-                
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;"> <input type="hidden" name="subject" value="New Resume Request from Portfolio">
                 <input type="hidden" name="message" value="A recruiter/visitor has requested a copy of your resume. Please reply to their email address.">
 
                 <div class="form-group">
@@ -981,6 +1018,73 @@
             if (e.target === modal) {
                 modal.classList.remove('active');
             }
+        });
+
+        // --- AJAX Form Submission & Toast Logic ---
+        const toastContainer = document.getElementById('toast-container');
+
+        // Function to create and show the toast
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span class="toast-icon">✓</span> ${message}`;
+            toastContainer.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Animate out and remove after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400); // Wait for transition to finish
+            }, 3500);
+        }
+
+        // Attach logic to all forms with 'ajax-form' class
+        const ajaxForms = document.querySelectorAll('.ajax-form');
+
+        ajaxForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stop the standard redirect
+
+                const formData = new FormData(form);
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerText;
+                
+                // Loading state
+                submitBtn.innerText = 'Sending...';
+                submitBtn.disabled = true;
+
+                // Send data in the background
+                fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(async (response) => {
+                    if (response.status === 200) {
+                        // Show the green success toast
+                        showToast('Message sent successfully!');
+                        form.reset(); // Clear all input fields
+                        
+                        // If the form is inside the popup modal, close the modal automatically
+                        const parentModal = form.closest('.modal-overlay');
+                        if (parentModal) {
+                            parentModal.classList.remove('active');
+                        }
+                    } else {
+                        alert('Something went wrong. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Something went wrong. Please try again.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitBtn.innerText = originalBtnText;
+                    submitBtn.disabled = false;
+                });
+            });
         });
     </script>
 </body>
