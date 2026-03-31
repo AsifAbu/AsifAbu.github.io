@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abu Asif | SQA Engineer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #0284c7; 
+            --primary-dark: #0369a1;
+            --bg-main: #f0fdfa; 
+            --bg-card: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --accent: #38bdf8;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        nav.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 1rem 5%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0; height: 2px;
+            bottom: -4px; left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* --- Shared Section Layout --- */
+        section {
+            padding: 6rem 5% 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-dark);
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 4px;
+            background: var(--primary);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding-top: 8rem;
+            gap: 4rem;
+        }
+
+        .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text-dark);
+        }
+
+        .verified-badge {
+            width: 28px;
+            height: 28px;
+            fill: var(--text-muted);
+        }
+        
+        .linkedin-headline {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .linkedin-headline .pipe {
+            color: var(--primary);
+            font-weight: 700;
+            margin: 0 4px;
+        }
+
+        .hero-text p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-img-container {
+            position: relative;
+        }
+        .hero-img-container::before {
+            content: '';
+            position: absolute;
+            top: -20px; left: -20px;
+            width: 100%; height: 100%;
+            border: 4px solid var(--accent);
+            border-radius: 50%;
+            z-index: -1;
+            transition: var(--transition);
+        }
+        .hero-img-container:hover::before {
+            transform: translate(10px, 10px);
+        }
+
+        .hero-img {
+            width: 380px; height: 380px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(2, 132, 199, 0.2);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(2, 132, 199, 0.3);
+        }
+
+        /* --- Skills & Certifications --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .skill-box {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+        .skill-box:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.1);
+        }
+        .skill-box h3 { margin-bottom: 1.5rem; color: var(--text-dark); display: flex; align-items: center; gap: 10px;}
+        
+        .tags { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+        .tag {
+            background: #e0f2fe;
+            color: var(--primary-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .cert-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 3rem;
+            box-shadow: 0 15px 30px rgba(2, 132, 199, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .cert-banner::after {
+            content: '🏆';
+            position: absolute;
+            font-size: 10rem;
+            opacity: 0.1;
+            right: -20px;
+            top: -20px;
+            transform: rotate(15deg);
+        }
+
+        /* --- Experience Timeline --- */
+        .timeline {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .timeline::before {
+            content: ''; position: absolute;
+            left: 20px; top: 0; bottom: 0;
+            width: 2px; background: #e2e8f0;
+        }
+        .timeline-item {
+            margin-bottom: 3rem;
+            padding-left: 60px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '⚙';
+            position: absolute;
+            left: 0; top: 0;
+            width: 42px; height: 42px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--primary); font-size: 1.2rem;
+            z-index: 1; box-shadow: 0 0 0 4px var(--bg-main);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border-left: 4px solid var(--primary);
+        }
+        .timeline-title h3 { font-size: 1.3rem; color: var(--text-dark); }
+        .timeline-title h4 { font-size: 1rem; color: var(--primary); font-weight: 600; }
+        
+        .timeline-meta { text-align: right; }
+        .date { font-weight: 600; color: var(--text-muted); font-size: 0.95rem;}
+        .duration { 
+            display: inline-block;
+            background: #e0f2fe; color: var(--primary-dark);
+            padding: 0.2rem 0.6rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700; margin-top: 5px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding-left: 1rem;
+        }
+        .task-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-muted);
+        }
+        .task-list li::before {
+            content: '✓';
+            position: absolute; left: 0; top: 3px;
+            background: #dcfce7; color: #16a34a;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 0.7rem; font-weight: bold;
+        }
+        .task-list li strong { color: var(--text-dark); }
+
+        /* --- Interactive Project Cards --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            height: 320px;
+            transition: var(--transition);
+        }
+        .project-card:hover { transform: translateY(-10px); }
+        
+        .project-front {
+            padding: 2rem;
+            height: 100%;
+            display: flex; flex-direction: column; justify-content: center;
+            transition: var(--transition);
+        }
+        .project-front h3 { font-size: 1.4rem; color: var(--primary); margin-bottom: 0.5rem;}
+        .project-front p { color: var(--text-muted); font-weight: 500; }
+        
+        .project-overlay {
+            position: absolute;
+            top: 100%; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #ffffff, #f0fdfa);
+            padding: 2rem;
+            transition: var(--transition);
+            display: flex; flex-direction: column;
+            border-top: 4px solid var(--primary);
+        }
+        .project-card:hover .project-overlay { top: 0; }
+        .project-card:hover .project-front { opacity: 0; }
+
+        .project-overlay ul {
+            list-style-type: disc;
+            padding-left: 1.2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        .btn-link {
+            text-align: center; background: var(--text-dark); color: white;
+            padding: 0.6rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: 0.3s;
+        }
+        .btn-link:hover { background: var(--primary); }
+
+        /* --- Contact Form Section --- */
+        .contact-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4rem;
+            background: var(--bg-card);
+            padding: 4rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+        }
+
+        .contact-details {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .contact-details h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .contact-details p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .contact-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .info-icon {
+            width: 45px;
+            height: 45px;
+            background: #e0f2fe;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .info-content h4 { color: var(--text-dark); font-size: 1rem; }
+        .info-content span, .info-content a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; }
+        .info-content a:hover { color: var(--primary); }
+
+        .contact-form {
+            flex: 1.5;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: var(--bg-main);
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            padding: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            background: var(--bg-card);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        /* Animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .hero { flex-direction: column; text-align: center; padding-top: 6rem; }
+            .name-wrapper { justify-content: center; }
+            .nav-links { display: none; }
+            .hero-img { width: 280px; height: 280px; }
+            .timeline::before { left: 0; }
+            .timeline-item { padding-left: 30px; }
+            .timeline-item::before { width: 20px; height: 20px; font-size: 0; left: -10px; top: 5px; }
+            .timeline-header { flex-direction: column; text-align: left; }
+            .timeline-meta { text-align: left; margin-top: 1rem; }
+            .contact-container { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="#" class="logo">A. Asif</a>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#skills">Skills & Certs</a>
+            <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <section id="about" class="hero reveal">
+        <div class="hero-text">
+            <div class="name-wrapper">
+                <h1>Abu Asif</h1>
+                <svg class="verified-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 1L2.5 5.5v5.7c0 5.4 3.9 10.5 9.5 11.8 5.6-1.3 9.5-6.4 9.5-11.8V5.5L12 1zm-1.8 15.6l-4.2-4.2 1.4-1.4 2.8 2.8 6.6-6.6 1.4 1.4-8 8z" fill="#475569"/>
+                </svg>
+            </div>
+            
+            <h2 class="linkedin-headline">
+                ISTQB® Certified <span class="pipe">|</span> RAG-MCP <span class="pipe">|</span> Automation <span class="pipe">|</span> SQL <span class="pipe">|</span> API <span class="pipe">|</span> SAFe <span class="pipe">|</span> Selenium BDD <span class="pipe">|</span> JMeter <span class="pipe">|</span> Quality Assurance Analyst at Veradigm®
+            </h2>
+            
+            <p>6+ years of experience in manual and automation testing across web, mobile, and desktop platforms. Expert in SDLC, Agile methodologies, and developing robust automation frameworks to ensure flawless software delivery.</p>
+            <div class="btn-group">
+                <a href="#contact" class="btn btn-primary">Hire Me / Request Resume</a>
+            </div>
+        </div>
+        <div class="hero-img-container">
+            <img src="profile.jpg" alt="Abu Asif" class="hero-img">
+        </div>
+    </section>
+
+    <section id="skills" class="reveal">
+        <h2 class="section-title">Technical Arsenal</h2>
+        <div class="skills-grid">
+            <div class="skill-box">
+                <h3>Languages & Scripts</h3>
+                <div class="tags">
+                    <span class="tag">Java</span><span class="tag">JavaScript</span>
+                    <span class="tag">Python</span><span class="tag">C++</span>
+                </div>
+            </div>
+            <div class="skill-box">
+                <h3>Frameworks & Automation</h3>
+                <div class="tags">
+                    <span class="tag">Selenium (BDD)</span><span class="tag">Cucumber</span>
+                    <span class="tag">REST Assured</span><span class="tag">Node.JS</span>
+                    <span class="tag">Laravel</span>
+                </div>
+            </div>
+            <div class="skill-box">
+                <h3>Testing Tools & DBs</h3>
+                <div class="tags">
+                    <span class="tag">Postman</span><span class="tag">Swagger</span><span class="tag">Mabl</span>
+                    <span class="tag">JMeter</span><span class="tag">Jenkins</span><span class="tag">Azure DevOps</span>
+                    <span class="tag">MS SQL Server</span><span class="tag">MySQL</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cert-banner reveal">
+            <h2>ISTQB® Certified Tester Foundation Level (CTFL v4.0)</h2>
+            <p style="margin-top: 10px; opacity: 0.9; margin-bottom: 20px;">International Software Testing Qualification Board Certified Software Test Engineer</p>
+            <a href="https://scr.istqb.org/?number=25-CTFL+4-265280-12" target="_blank" class="btn btn-outline" style="border-color: white; color: white; background: rgba(255,255,255,0.1);">Verify Credential</a>
+        </div>
+    </section>
+
+    <section id="experience" class="reveal">
+        <h2 class="section-title">Professional Journey</h2>
+        <div class="timeline">
+            <div class="timeline-item reveal">
+                <div class="timeline-header">
+                    <div class="timeline-title">
+                        <h3>Quality Assurance Analyst</h3>
+                        <h4>Mercury IT (Veradigm)</h4>
+                    </div>
+                    <div class="timeline-meta">
+                        <div class="date">July 2024 - Present</div>
+                        <div class="duration">1 yr 9 mos</div>
+                    </div>
+                </div>
+                <ul class="task-list">
+                    <li><strong>US Healthcare Domain:</strong> Worked extensively with Medicare, Medicaid, EDGE, and HIPAA-compliant healthcare systems.</li>
+                    <li><strong>Claims Validation:</strong> Tested Medical, Pharmacy, Dental, and Enrollment claims workflows, including billing and coding rules.</li>
+                    <li><strong>Database Testing:</strong> Conducted in-depth SQL database testing to validate claims data accuracy using RDS and Amazon Redshift.</li>
+                    <li><strong>Automation Efficiency:</strong> Developed scripts to generate CMS response files from EDI 837 inputs, reducing generation time.</li>
+                    <li><strong>Ownership:</strong> Took end-to-end ownership of features ensuring successful, on-time client delivery.</li>
+                </ul>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-header">
+                    <div class="timeline-title">
+                        <h3>SQA Engineer</h3>
+                        <h4>Kaz Software</h4>
+                    </div>
+                    <div class="timeline-meta">
+                        <div class="date">Dec 2020 - June 2024</div>
+                        <div class="duration">3 yrs 7 mos</div>
+                    </div>
+                </div>
+                <ul class="task-list">
+                    <li><strong>Automation:</strong> Performed manual and automation testing using Java Selenium BDD (Cucumber) and Mabl for web applications.</li>
+                    <li><strong>CI/CD Pipelines:</strong> Integrated automation with Jenkins, Azure DevOps, and TeamCity.</li>
+                    <li><strong>API Testing:</strong> Validated endpoints using Postman, Swagger, and REST Assured (Java).</li>
+                    <li><strong>Performance:</strong> Participated in load testing using JMeter and executed cross-browser/platform testing (Android/iOS/Desktop).</li>
+                    <li><strong>QA Leadership:</strong> Handled projects independently as the sole QA utilizing JIRA and YouTrack.</li>
+                </ul>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-header">
+                    <div class="timeline-title">
+                        <h3>SQA Engineer (Intern)</h3>
+                        <h4>NYK Advance, Max Group</h4>
+                    </div>
+                    <div class="timeline-meta">
+                        <div class="date">Jan 2020 - Aug 2020</div>
+                        <div class="duration">8 mos</div>
+                    </div>
+                </div>
+                <ul class="task-list">
+                    <li>Conducted Manual and Automated testing of an ERP System and authored test cases.</li>
+                    <li>Built Automation frameworks with Java Selenium BDD and JavaScript-based Selenium.</li>
+                    <li>Gained practical experience with TestNG, Maven, and Jira.</li>
+                </ul>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-header" style="border-left-color: #94a3b8;">
+                    <div class="timeline-title">
+                        <h3>B.Sc. in Computer Science & Software Engineering</h3>
+                        <h4 style="color: var(--text-muted)">American International University-Bangladesh (AIUB)</h4>
+                    </div>
+                    <div class="timeline-meta">
+                        <div class="date">Graduated April 2020</div>
+                        <div class="duration" style="background:#f1f5f9; color:#475569;">CGPA: 3.46 / 4.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="reveal">
+        <h2 class="section-title">Project Portfolio</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>Deven Software</h3>
+                    <p>Mergers & Acquisitions (M&A) SaaS</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Automated regression test matrix using Mabl.</li>
+                        <li>Maintained coverage in an Agile Azure DevOps environment.</li>
+                    </ul>
+                    <a href="https://www.devensoft.com/" target="_blank" class="btn-link">View Live Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>UPay</h3>
+                    <p>Digital Financial Services (UCB Fintech)</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Executed E2E testing for web portals and mobile applications.</li>
+                        <li>Authored comprehensive test execution reports.</li>
+                    </ul>
+                    <a href="https://www.upaybd.com/" target="_blank" class="btn-link">View Live Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>Roboket</h3>
+                    <p>CRM - ADN Diginet Ltd.</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Executed regression and smoke testing.</li>
+                        <li>Conducted extensive API testing using Swagger.</li>
+                    </ul>
+                    <a href="https://roboket.com/" target="_blank" class="btn-link">View Live Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>AARONG</h3>
+                    <p>E-commerce Retail Chain</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Participated in JMeter load testing.</li>
+                        <li>Conducted API validations using Postman.</li>
+                    </ul>
+                    <a href="https://www.aarong.com/" target="_blank" class="btn-link">View Live Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>Gateway to Access</h3>
+                    <p>Language & Technology Solutions</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Conducted audio/video call testing and live chat testing.</li>
+                        <li>Verified APIs using REST Assured.</li>
+                    </ul>
+                    <span style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:auto;">B2B / Internal System</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>Healthcare Claim DTS</h3>
+                    <p>Data Transmission System</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Managed full cycle claim submissions (Medicare, Medicaid & EDGE).</li>
+                        <li>Validated response processing systems.</li>
+                    </ul>
+                    <span style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:auto;">Enterprise Internal</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>World Tax Analyzer (WTA)</h3>
+                    <p>Tax Analytics Platform</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Automated testing using Selenium BDD.</li>
+                        <li>Integrated automation with Jenkins CI/CD.</li>
+                    </ul>
+                    <span style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:auto;">Enterprise Tool</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-front">
+                    <h3>Transfer Pricing Analyzer</h3>
+                    <p>Financial Platform</p>
+                </div>
+                <div class="project-overlay">
+                    <ul>
+                        <li>Performed comprehensive manual testing to validate complex financial logic.</li>
+                    </ul>
+                    <span style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:auto;">Enterprise Tool</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="reveal">
+        <h2 class="section-title">Get in Touch</h2>
+        <div class="contact-container">
+            
+            <div class="contact-details">
+                <h3>Let's collaborate.</h3>
+                <p>Currently open to Senior SQA Analyst or Engineering roles. Use the form to request my full resume or discuss opportunities.</p>
+                
+                <div class="contact-info-list">
+                    <div class="info-item">
+                        <div class="info-icon">📧</div>
+                        <div class="info-content">
+                            <h4>Email</h4>
+                            <a href="mailto:aa.asifabu@gmail.com">aa.asifabu@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📱</div>
+                        <div class="info-content">
+                            <h4>Phone</h4>
+                            <span>+8801780963777</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🔗</div>
+                        <div class="info-content">
+                            <h4>LinkedIn & GitHub</h4>
+                            <a href="https://www.linkedin.com/in/abu-asif/" target="_blank">linkedin.com/in/abu-asif</a><br>
+                            <a href="https://github.com/AsifAbu" target="_blank">github.com/AsifAbu</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" class="form-control" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 234 567 8900">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="_replyto" class="form-control" required placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message / Resume Request</label>
+                    <textarea id="message" name="message" class="form-control" required placeholder="Hi Abu, I would like to request a copy of your resume..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+            </form>
+
+        </div>
+    </section>
+
+    <footer style="text-align:center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; margin-top: 2rem;">
+        <p>&copy; 2026 Abu Asif. Engineered for Quality.</p>
+    </footer>
+
+    <script>
+        // Navigation Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll Reveal Animation
+        const reveals = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Trigger on load
+    </script>
+</body>
+</html>
