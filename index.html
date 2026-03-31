@@ -60,7 +60,7 @@
             letter-spacing: -0.5px;
         }
 
-        .nav-links { display: flex; gap: 2rem; }
+        .nav-links { display: flex; gap: 2rem; align-items: center;}
         .nav-links a {
             text-decoration: none;
             color: var(--text-dark);
@@ -68,7 +68,7 @@
             font-size: 0.95rem;
             position: relative;
         }
-        .nav-links a::after {
+        .nav-links a:not(.resume-btn)::after {
             content: '';
             position: absolute;
             width: 0; height: 2px;
@@ -76,7 +76,20 @@
             background-color: var(--primary);
             transition: var(--transition);
         }
-        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:not(.resume-btn):hover::after { width: 100%; }
+        
+        /* Special styling for Resume Nav Button */
+        .resume-btn {
+            background: var(--primary);
+            color: white !important;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+        .resume-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
 
         /* --- Shared Section Layout --- */
         section {
@@ -498,6 +511,68 @@
             min-height: 150px;
         }
 
+        /* --- Resume Popup Modal Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem; right: 1.5rem;
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            line-height: 1;
+        }
+        
+        .close-modal:hover {
+            color: var(--primary);
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+        }
+        
+        .modal-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
         /* Animations */
         .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
@@ -505,7 +580,7 @@
         @media (max-width: 768px) {
             .hero { flex-direction: column; text-align: center; padding-top: 6rem; }
             .name-wrapper { justify-content: center; }
-            .nav-links { display: none; }
+            .nav-links { display: none; } /* On mobile, you might want to add a hamburger menu later */
             .hero-img { width: 280px; height: 280px; }
             .timeline::before { left: 0; }
             .timeline-item { padding-left: 30px; }
@@ -526,6 +601,7 @@
             <a href="#experience">Experience</a>
             <a href="#projects">Projects</a>
             <a href="#contact">Contact</a>
+            <a href="#" id="openResumeModal" class="resume-btn">Resume</a>
         </div>
     </nav>
 
@@ -544,7 +620,7 @@
             
             <p>6+ years of experience in manual and automation testing across web, mobile, and desktop platforms. Expert in SDLC, Agile methodologies, and developing robust automation frameworks to ensure flawless software delivery.</p>
             <div class="btn-group">
-                <a href="#contact" class="btn btn-primary">Hire Me / Request Resume</a>
+                <a href="#contact" class="btn btn-primary">Hire Me / Get in Touch</a>
             </div>
         </div>
         <div class="hero-img-container">
@@ -582,8 +658,7 @@
         
         <div class="cert-banner reveal">
             <h2>ISTQB® Certified Tester Foundation Level (CTFL v4.0)</h2>
-            <p style="margin-top: 10px; opacity: 0.9; margin-bottom: 20px;">International Software Testing Qualification Board Certified Software Test Engineer</p>
-            <a href="https://scr.istqb.org/?number=25-CTFL+4-265280-12" target="_blank" class="btn btn-outline" style="border-color: white; color: white; background: rgba(255,255,255,0.1);">Verify Credential</a>
+            <p style="margin-top: 10px; opacity: 0.9;">International Software Testing Qualification Board Certified Software Test Engineer</p>
         </div>
     </section>
 
@@ -775,7 +850,7 @@
             
             <div class="contact-details">
                 <h3>Let's collaborate.</h3>
-                <p>Currently open to Senior SQA Analyst or Engineering roles. Use the form to request my full resume or discuss opportunities.</p>
+                <p>Currently open to Senior SQA Analyst or Engineering roles. Reach out to discuss opportunities.</p>
                 
                 <div class="contact-info-list">
                     <div class="info-item">
@@ -803,7 +878,10 @@
                 </div>
             </div>
 
-            <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+                
+                <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="name">Full Name</label>
@@ -816,11 +894,11 @@
                 </div>
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="_replyto" class="form-control" required placeholder="john@example.com">
+                    <input type="email" id="email" name="email" class="form-control" required placeholder="john@example.com">
                 </div>
                 <div class="form-group">
-                    <label for="message">Message / Resume Request</label>
-                    <textarea id="message" name="message" class="form-control" required placeholder="Hi Abu, I would like to request a copy of your resume..."></textarea>
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" class="form-control" required placeholder="Hi Abu, I'd like to discuss an opportunity..."></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
             </form>
@@ -831,6 +909,30 @@
     <footer style="text-align:center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; margin-top: 2rem;">
         <p>&copy; 2026 Abu Asif. Engineered for Quality.</p>
     </footer>
+
+    <div id="resumeModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h3>Request My Resume</h3>
+            <p>Enter your email below, and I will send you a copy of my latest resume directly.</p>
+            
+            <form action="https://api.web3forms.com/submit" method="POST">
+                
+                <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                
+                <input type="hidden" name="subject" value="New Resume Request from Portfolio">
+                
+                <input type="hidden" name="message" value="A recruiter/visitor has requested a copy of your resume. Please reply to their email address.">
+
+                <div class="form-group">
+                    <label for="resume-email">Your Email Address</label>
+                    <input type="email" id="resume-email" name="email" class="form-control" required placeholder="john@example.com">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Request Resume</button>
+            </form>
+        </div>
+    </div>
 
     <script>
         // Navigation Scroll Effect
@@ -857,6 +959,29 @@
         };
         window.addEventListener('scroll', revealOnScroll);
         revealOnScroll(); // Trigger on load
+
+        // Popup (Modal) Logic
+        const modal = document.getElementById('resumeModal');
+        const openBtn = document.getElementById('openResumeModal');
+        const closeBtn = document.getElementById('closeModal');
+
+        // Open popup
+        openBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevents page jumping to top
+            modal.classList.add('active');
+        });
+
+        // Close popup by X button
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // Close popup by clicking anywhere outside the box
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
