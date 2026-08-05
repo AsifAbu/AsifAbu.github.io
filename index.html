@@ -146,8 +146,8 @@ html{scrollbar-color:var(--border-strong) var(--bg-elev);scrollbar-width:thin}
 }
 ::-webkit-scrollbar-corner{background:var(--bg-elev)}
 /* nested scrollers (the sheet, code blocks) get a slimmer, quieter bar */
-.sheet::-webkit-scrollbar,.doc-body::-webkit-scrollbar,.term-body::-webkit-scrollbar{width:8px;height:8px}
-.sheet::-webkit-scrollbar-thumb,.doc-body::-webkit-scrollbar-thumb,.term-body::-webkit-scrollbar-thumb{
+.sheet::-webkit-scrollbar,.doc-body::-webkit-scrollbar{width:8px;height:8px}
+.sheet::-webkit-scrollbar-thumb,.doc-body::-webkit-scrollbar-thumb{
   background:var(--border-strong);border-width:2px;background-clip:padding-box;
 }
 
@@ -174,7 +174,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .skip:focus{left:0}
 
 /* ---------- primitives ---------- */
-.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-inline:var(--gut)}
+/* Content width lives in one knob. Change --maxw to set the exact page width;
+   long-form text keeps its own ch caps so only the grids get wider. */
+:root{--maxw:1220px}
+.wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gut)}
 .mono{font-family:var(--mono);font-variant-ligatures:none}
 .eyebrow{
   font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
@@ -215,12 +218,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav-cta:active{transform:scale(.95);transition-duration:70ms}
 
 /* ---------- section scaffolding ---------- */
-section{padding-block:clamp(3.5rem,8vw,6.5rem);scroll-margin-top:88px;position:relative}
+/* Two adjacent sections stack their padding, so 6.5rem each was producing a ~184px
+   dead band between them. 4rem each gives ~128px, which still reads as separation
+   because the .band background and border already do that work. */
+section{padding-block:clamp(1.75rem,3.5vw,2.5rem);scroll-margin-top:80px;position:relative}
 .band{
   background:var(--bg-elev);border-block:1px solid var(--border);
   transition:background-color var(--t),border-color var(--t);
 }
-.sec-head{margin-bottom:clamp(2rem,5vw,3.25rem);max-width:62ch}
+.sec-head{margin-bottom:clamp(1.25rem,2.6vw,1.85rem);max-width:62ch}
 .sec-head .idx{
   font-family:var(--mono);font-size:.72rem;color:var(--faint);letter-spacing:.14em;
   display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem;
@@ -275,7 +281,7 @@ nav.scrolled::before{
 
 .nav-right{display:flex;align-items:center;gap:.55rem;flex:1;justify-content:flex-end;z-index:1001}
 .icon-btn{
-  width:40px;height:40px;display:grid;place-items:center;border-radius:50%;
+  width:40px;height:40px;display:grid;place-items:center;border-radius:50%;flex-shrink:0;
   background:var(--surface);border:1px solid var(--border);color:var(--text);transition:var(--t);
 }
 .icon-btn:hover{border-color:var(--signal);color:var(--signal)}
@@ -301,6 +307,9 @@ nav.scrolled::before{
   background:var(--text);color:var(--bg);padding:.6rem 1.1rem;border-radius:99px;
   font-weight:650;font-size:.86rem;display:inline-flex;align-items:center;gap:7px;
   transition:var(--t);position:relative;overflow:hidden;
+  /* It isn't a .btn, so it never inherited nowrap - "Let's Talk" was breaking onto
+     two lines and dragging the whole nav bar to 65px tall. */
+  white-space:nowrap;flex-shrink:0;
 }
 .nav-cta:hover{transform:translateY(-2px);opacity:.92}
 .nav-cta svg{transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
@@ -318,28 +327,32 @@ nav.scrolled::before{
 #burger{display:none}
 
 /* ================= HERO ================= */
-.hero{padding-top:clamp(6.5rem,14vw,9rem);padding-bottom:clamp(3rem,7vw,5rem)}
+/* Tight enough that the hero + skill marquee land within the first viewport.
+   padding-top only needs to clear the fixed nav (~48px) plus a little air. */
+.hero{padding-top:clamp(4.75rem,8vw,5.5rem);padding-bottom:clamp(1.5rem,2.5vw,1.9rem)}
 .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(.8rem,1.6vw,1.15rem)}
+/* intro (left) with the 4 stat cards beneath it; photo spans both rows on the right at
+   full height. The photo <img> is absolutely positioned (below), so spanning 2 rows
+   doesn't balloon the height - the row heights follow intro + stats. */
 .b-intro{grid-column:1/8}
 .b-photo{grid-column:8/13;grid-row:1/3}
 .b-stats{grid-column:1/8}
-.b-term{grid-column:1/13}
 
 .b-intro{padding:clamp(1.4rem,3.4vw,2.4rem)}
-.avail{
-  display:inline-flex;align-items:center;gap:9px;padding:.4rem .85rem;border-radius:99px;
-  background:var(--signal-soft);border:1px solid var(--signal-line);
-  font-size:.8rem;font-weight:600;color:var(--signal);margin-bottom:1.4rem;
+/* role eyebrow, first line of the hero */
+.hero-meta{
+  font-family:var(--mono);font-size:.76rem;color:var(--signal);
+  letter-spacing:.08em;margin-bottom:.9rem;
 }
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2.2s infinite}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2.2s infinite;flex-shrink:0}
 @keyframes pulse{
   0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--signal) 55%,transparent)}
   70%{box-shadow:0 0 0 7px transparent}
   100%{box-shadow:0 0 0 0 transparent}
 }
 .hero h1{
-  font-size:clamp(2.6rem,7vw,4.1rem);font-weight:800;letter-spacing:-.045em;line-height:.98;
-  margin-block:.55rem .8rem;
+  font-size:clamp(2.5rem,6vw,3.6rem);font-weight:800;letter-spacing:-.045em;line-height:1;
+  margin-block:.5rem .75rem;
 }
 .hero-tag{
   font-size:clamp(1.1rem,2.7vw,1.5rem);font-weight:600;letter-spacing:-.022em;
@@ -354,10 +367,12 @@ nav.scrolled::before{
 .hero-body strong{color:var(--text);font-weight:600}
 .hero-actions{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
 
-.b-photo{position:relative;overflow:hidden;padding:0;min-height:340px}
-/* He stands right of centre in the source. On desktop the card is narrower than the
-   image so cover crops horizontally - 60% keeps him framed instead of trimming him. */
-.b-photo img{width:100%;height:100%;object-fit:cover;object-position:60% 20%}
+.b-photo{position:relative;overflow:hidden;padding:0;min-height:360px}
+/* The img is absolutely positioned so its intrinsic portrait height does NOT drive
+   the grid row - otherwise a 666px-wide portrait balloons the row to ~888px and the
+   hero overflows the fold. Row height now follows the intro; photo just fills it.
+   He stands right of centre, so 58%/18% keeps his face in frame on the wide crop. */
+.b-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:58% 18%}
 .b-photo::after{
   content:'';position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,transparent 45%,color-mix(in srgb,var(--bg) 85%,transparent) 100%);
@@ -368,35 +383,32 @@ nav.scrolled::before{
 }
 
 .b-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(.8rem,1.6vw,1.15rem);background:none;border:none}
-.stat{padding:clamp(.9rem,2vw,1.3rem);display:flex;flex-direction:column;gap:.15rem;position:relative;overflow:hidden}
+.stat{padding:clamp(.7rem,1.5vw,.95rem) clamp(.9rem,2vw,1.3rem);display:flex;flex-direction:column;gap:.1rem;position:relative;overflow:hidden}
 .stat:hover{border-color:var(--border-strong);transform:translateY(-3px)}
-.stat .num{font-size:clamp(1.5rem,3.4vw,2.05rem);font-weight:800;letter-spacing:-.04em;line-height:1;font-family:var(--mono)}
-.stat .lbl{font-size:.73rem;color:var(--faint);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.stat .num{font-size:clamp(1.4rem,3vw,1.8rem);font-weight:800;letter-spacing:-.04em;line-height:1;font-family:var(--mono)}
+.stat .lbl{font-size:.7rem;color:var(--faint);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;line-height:1.3}
 .stat--signal .num{color:var(--signal)}
 .stat--amber .num{color:var(--amber)}
 
-/* terminal strip */
-.b-term{
-  padding:0;overflow:hidden;background:var(--bg-elev);
-  font-family:var(--mono);font-size:clamp(.72rem,1.5vw,.82rem);
+/* ================= SKILLS TICKER ================= */
+.marquee{
+  overflow:hidden;border-block:1px solid var(--border);background:var(--bg-elev);
+  padding-block:.95rem;
+  /* fade both ends so items enter and leave instead of getting cut off */
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  transition:background-color var(--t),border-color var(--t);
 }
-.term-bar{
-  display:flex;align-items:center;gap:.55rem;padding:.6rem .95rem;
-  border-bottom:1px solid var(--border);background:var(--surface-2);
+.marquee-track{display:flex;width:max-content;animation:marquee 42s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+/* two identical sets, so -50% lands exactly one set over and the loop is seamless */
+.marquee-set{display:flex;align-items:center;gap:1.9rem;padding-right:1.9rem;flex-shrink:0}
+.marquee-set span{
+  font-family:var(--mono);font-size:.76rem;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);white-space:nowrap;
 }
-.term-dot{width:9px;height:9px;border-radius:50%;background:var(--border-strong)}
-.term-title{color:var(--faint);font-size:.72rem;margin-left:.35rem;letter-spacing:.04em}
-.term-body{padding:.95rem 1.1rem 1.15rem;min-height:8.6rem;line-height:1.85;overflow-x:auto}
-.term-body .l{display:block;white-space:pre;color:var(--dim)}
-.term-body .p{color:var(--signal)}
-.term-body .c{color:var(--faint)}
-.term-body .k{color:var(--sky)}
-.term-body .ok{color:var(--signal);font-weight:700}
-.caret{
-  display:inline-block;width:.55em;height:1.05em;vertical-align:-.18em;
-  background:var(--signal);animation:blink 1.05s step-end infinite;
-}
-@keyframes blink{50%{opacity:0}}
+.marquee-set .sep{color:var(--signal);font-size:.6rem;letter-spacing:0}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* ================= EXPERTISE ================= */
 .dom-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:clamp(1rem,2.4vw,1.6rem)}
@@ -415,7 +427,10 @@ nav.scrolled::before{
 .dom-row .m{margin-left:auto;color:var(--faint);font-size:.78rem;font-family:var(--mono);flex-shrink:0}
 
 /* ================= CREDENTIALS ================= */
-.cred-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,258px),1fr));gap:clamp(1rem,2.2vw,1.5rem)}
+/* Explicit 3 columns. auto-fit was flipping between 3 and 4 tracks as --maxw changed;
+   at 4 tracks the tall HIPAA card shared row 1 with the hero and stretched it, leaving
+   a big empty gap. Fixed 3 keeps row 1 = ISTQB(span 2) + CTF, everything else on row 2. */
+.cred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2.2vw,1.5rem)}
 .cred{padding:var(--pad);display:flex;flex-direction:column;gap:.7rem;position:relative;overflow:hidden}
 .cred:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
 .cred--hero{grid-column:span 2;flex-direction:row;align-items:center;gap:clamp(1rem,3vw,1.9rem);border-color:var(--signal-line);background:linear-gradient(135deg,var(--signal-soft),transparent 62%),var(--surface)}
@@ -449,7 +464,11 @@ nav.scrolled::before{
 .rank span{font-size:.82rem;font-weight:500;color:var(--faint)}
 
 /* ================= EXPERIENCE ================= */
-.tl{max-width:900px;position:relative;padding-left:clamp(1.6rem,4vw,2.4rem)}
+/* Experience is centred in the wide canvas (its own request) so the 900px timeline
+   doesn't hug the left with a big empty right gutter. Header centres to match. */
+.tl{max-width:900px;margin-inline:auto;position:relative;padding-left:clamp(1.6rem,4vw,2.4rem)}
+#experience .sec-head{margin-inline:auto;text-align:center;max-width:640px}
+#experience .sec-head .idx{justify-content:center}
 .tl::before{content:'';position:absolute;left:5px;top:.6rem;bottom:.6rem;width:1px;background:var(--border)}
 .tl-item{position:relative;margin-bottom:clamp(1.6rem,4vw,2.4rem)}
 .tl-item:last-child{margin-bottom:0}
@@ -591,9 +610,7 @@ nav.scrolled::before{
 }
 .proof{padding:var(--pad);display:flex;flex-direction:column;gap:.75rem}
 .proof:hover{border-color:var(--border-strong)}
-/* Cards carrying a full document promote themselves to the full row width when
-   opened, so the monospace report is readable instead of squeezed into one column. */
-.proof--doc.is-open{grid-column:1/-1}
+/* Detail now opens in a dialog, so cards never resize or push their neighbours down. */
 
 /* the one-line claim that replaces the old opening paragraph */
 .proof-claim{font-size:.9rem;font-weight:550;color:var(--text);line-height:1.5;text-wrap:balance}
@@ -624,10 +641,76 @@ nav.scrolled::before{
 .proof-top .k{font-family:var(--mono);font-size:.68rem;color:var(--faint);letter-spacing:.09em;text-transform:uppercase;margin-top:3px}
 .proof > p{font-size:.885rem;color:var(--dim);line-height:1.62}
 .proof dl{display:grid;gap:.72rem;margin-top:.15rem}
-/* everything heavy lives here, collapsed until asked for */
-.proof-detail{display:none;padding-top:.85rem;margin-top:.1rem;border-top:1px dashed var(--border)}
-.proof-detail[data-open]{display:block;animation:slideIn 520ms var(--ease-expo)}
+/* Heavy detail lives in the card's DOM (crawlable, works without JS) but is hidden.
+   On open, the node is MOVED into the dialog and moved back on close - no duplicate
+   markup, and the card itself never changes size. */
+.proof-detail{display:none}
+.proof-detail[data-open]{display:block}
 .proof-detail .doc{margin-top:0}
+
+/* the proof card's action is now the card's primary control, so it reads as one */
+.proof .disclose{
+  background:var(--signal-soft);border-color:var(--signal-line);color:var(--signal);font-weight:700;
+}
+.proof .disclose:hover{
+  background:color-mix(in srgb,var(--signal) 22%,transparent);
+  border-color:var(--signal);transform:translateY(-1px);
+}
+.proof .disclose svg{transform:none}
+
+/* project cards still expand in place, so they DO get an expanded state */
+#projGrid .disclose[aria-expanded="true"]{
+  background:var(--signal-soft);border-color:var(--signal-line);color:var(--signal);
+}
+
+/* ================= DETAIL DIALOG ================= */
+.mscrim{
+  position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.7);
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+  opacity:0;visibility:hidden;
+  transition:opacity 420ms var(--ease-soft),visibility 420ms var(--ease-soft);
+}
+.mscrim.open{opacity:1;visibility:visible}
+.modal{
+  position:fixed;z-index:3001;left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(.96);
+  width:min(920px,calc(100vw - 2 * var(--gut)));max-height:86vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--bg-elev);border:1px solid var(--border-strong);
+  border-radius:var(--r-xl);box-shadow:0 30px 90px -24px rgba(0,0,0,.75);
+  opacity:0;visibility:hidden;
+  transition:opacity 440ms var(--ease-expo),transform 440ms var(--ease-expo),visibility 440ms;
+}
+.modal.open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.modal-head{
+  display:flex;align-items:flex-start;gap:1rem;flex-shrink:0;
+  padding:1.15rem var(--pad) .95rem;border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.modal-head-txt{min-width:0;flex:1}
+.modal-kicker{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--signal);display:block;margin-bottom:.3rem;
+}
+.modal-head h2{font-size:clamp(1.02rem,2.6vw,1.25rem);font-weight:750;letter-spacing:-.022em;line-height:1.3}
+.modal-x{
+  width:34px;height:34px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;
+  background:var(--bg);border:1px solid var(--border);color:var(--dim);transition:var(--t);
+}
+.modal-x:hover{border-color:var(--rose);color:var(--rose);transform:rotate(90deg)}
+.modal-body{padding:var(--pad);overflow-y:auto;overscroll-behavior:contain;flex:1}
+.modal-body .proof-detail{border-top:none;padding-top:0;margin-top:0}
+.modal-body::-webkit-scrollbar{width:8px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--border-strong);border:2px solid var(--bg-elev);background-clip:padding-box}
+
+/* on small screens it becomes a full-width sheet rising from the bottom */
+@media (max-width:700px){
+  .modal{
+    left:0;right:0;top:auto;bottom:0;width:100%;max-height:92vh;
+    transform:translateY(101%);border-radius:var(--r-xl) var(--r-xl) 0 0;border-bottom:none;
+  }
+  .modal.open{transform:translateY(0)}
+}
 .proof dt{font-family:var(--mono);font-size:.67rem;letter-spacing:.11em;text-transform:uppercase;color:var(--signal);margin-bottom:.2rem}
 .proof dd{font-size:.875rem;color:var(--dim);line-height:1.6}
 .proof-foot{margin-top:auto;padding-top:.5rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
@@ -731,13 +814,20 @@ nav.scrolled::before{
 .btn--brand:hover{transform:translateY(-2px);filter:brightness(1.08)}
 
 /* ================= CONTACT ================= */
-.ct-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(1.4rem,4vw,3rem);align-items:start}
+/* stretch so the form card and the info column are exactly equal height */
+.ct-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(1.4rem,4vw,3rem);align-items:stretch}
 .ct-list{display:grid;gap:.75rem;margin-bottom:1.5rem}
-.ct-row{display:flex;align-items:center;gap:.9rem;padding:.85rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);transition:var(--t)}
+.ct-row{display:flex;align-items:center;gap:.95rem;padding:.9rem 1.05rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);transition:var(--t)}
 .ct-row:hover{border-color:var(--signal-line);transform:translateX(3px)}
-.ct-ico{width:36px;height:36px;flex-shrink:0;border-radius:10px;display:grid;place-items:center;background:var(--signal-soft);border:1px solid var(--signal-line);color:var(--signal)}
-.ct-row .k{font-family:var(--mono);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;color:var(--faint)}
-.ct-row .v{font-size:.9rem;font-weight:600;word-break:break-word;line-height:1.4}
+.ct-ico{width:38px;height:38px;flex-shrink:0;border-radius:10px;display:grid;place-items:center;background:var(--signal-soft);border:1px solid var(--signal-line);color:var(--signal)}
+/* The label and value were both display:inline, so they rendered jammed together as
+   "EMAILaa.asifabu@gmail.com". Stack them and let the label carry its own weight. */
+.ct-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ct-row .k{
+  display:block;font-family:var(--mono);font-size:.63rem;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+}
+.ct-row .v{display:block;font-size:.94rem;font-weight:650;word-break:break-word;line-height:1.35;letter-spacing:-.01em}
 .socials{display:flex;flex-wrap:wrap;gap:.5rem}
 .soc{
   display:inline-flex;align-items:center;gap:8px;padding:.6rem 1rem;border-radius:99px;
@@ -745,10 +835,19 @@ nav.scrolled::before{
 }
 .soc:hover{border-color:var(--signal);color:var(--signal);transform:translateY(-2px)}
 
-.form-card{padding:clamp(1.3rem,3.4vw,2.2rem)}
-.form-card h3{font-size:1.15rem;font-weight:750;letter-spacing:-.02em;margin-bottom:.35rem}
+.form-card{padding:clamp(1.3rem,3.4vw,2.2rem);display:flex;flex-direction:column}
+.form-card h3{font-size:1.15rem;font-weight:750;letter-spacing:-.02em}
+/* header row: title left, reply-time badge right-aligned */
+.form-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.35rem}
+.reply-badge{font-family:var(--mono);font-size:.72rem;color:var(--signal);white-space:nowrap}
+/* trim the last section's bottom padding so it doesn't stack with the footer's top */
+#contact{padding-bottom:clamp(.75rem,1.5vw,1.15rem)}
 .form-card .hint{font-size:.85rem;color:var(--dim);margin-bottom:1.3rem}
-form.contact{display:grid;gap:.95rem}
+/* form fills the card; the message field grows so the form's height matches the
+   info column with no gap under the Send button */
+form.contact{display:flex;flex-direction:column;gap:.95rem;flex:1}
+.field--grow{display:flex;flex-direction:column;flex:1;min-height:118px}
+.field--grow textarea{flex:1;min-height:0}
 .field label{
   display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--faint);margin-bottom:.4rem;font-weight:500;
@@ -761,13 +860,12 @@ form.contact{display:grid;gap:.95rem}
 .field input::placeholder,.field textarea::placeholder{color:var(--faint)}
 .field input:focus,.field textarea:focus{outline:none;border-color:var(--signal);box-shadow:var(--ring)}
 .field textarea{resize:vertical;min-height:118px}
-.form-note{font-size:.75rem;color:var(--faint);text-align:center;font-family:var(--mono)}
 .hp{position:absolute;left:-9999px}
 
 /* ================= FOOTER ================= */
 footer{
   background:var(--bg-elev);border-top:1px solid var(--border);
-  padding-block:clamp(2.5rem,6vw,4rem) 1.6rem;
+  padding-block:clamp(1.5rem,3vw,2rem) 1.6rem;
   transition:background-color var(--t),border-color var(--t);
 }
 .f-top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:clamp(1.6rem,4vw,3rem);margin-bottom:2.6rem}
@@ -802,16 +900,32 @@ footer{
   transition:opacity 460ms var(--ease-soft),visibility 460ms var(--ease-soft);
 }
 .scrim.open{opacity:1;visibility:visible}
+/* Centred dialog on desktop (it used to span the full width as a bottom sheet).
+   visibility:hidden while closed also keeps its form fields out of the tab order. */
 .sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:2001;
-  background:var(--bg-elev);border-top:1px solid var(--border);
-  border-radius:var(--r-xl) var(--r-xl) 0 0;
-  padding:1.1rem var(--gut) calc(1.6rem + env(safe-area-inset-bottom));
-  max-height:92vh;overflow-y:auto;transform:translateY(101%);
-  transition:transform var(--t-sheet) var(--ease-expo);
-  box-shadow:0 -14px 44px rgba(0,0,0,.42);
+  position:fixed;z-index:2001;left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(.96);
+  width:min(700px,calc(100vw - 2 * var(--gut)));max-height:88vh;overflow-y:auto;
+  background:var(--bg-elev);border:1px solid var(--border-strong);
+  border-radius:var(--r-xl);padding:clamp(1.5rem,3vw,2.2rem);
+  box-shadow:0 30px 90px -24px rgba(0,0,0,.75);
+  opacity:0;visibility:hidden;
+  transition:opacity var(--t-sheet) var(--ease-expo),transform var(--t-sheet) var(--ease-expo),visibility var(--t-sheet);
 }
-.sheet.open{transform:none}
+.sheet.open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.grab{display:none}
+
+/* below 700px it becomes a bottom sheet again, where that pattern belongs */
+@media (max-width:700px){
+  .sheet{
+    left:0;right:0;top:auto;bottom:0;width:100%;max-height:92vh;
+    transform:translateY(101%);
+    border-radius:var(--r-xl) var(--r-xl) 0 0;border-bottom:none;
+    padding:1.1rem var(--gut) calc(1.6rem + env(safe-area-inset-bottom));
+  }
+  .sheet.open{transform:translateY(0)}
+  .grab{display:block}
+}
 
 /* Sheet contents cascade up behind the slide. `backwards` fill means the hidden
    state only applies during the delay - if the animation never runs the content is
@@ -825,7 +939,7 @@ footer{
 .sheet.open .sheet-in > :nth-child(7){animation-delay:445ms}
 @keyframes sheetIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 .grab{width:44px;height:4px;background:var(--border-strong);border-radius:99px;margin:0 auto 1.3rem}
-.sheet-in{max-width:600px;margin-inline:auto;position:relative}
+.sheet-in{max-width:620px;margin-inline:auto;position:relative}
 .sheet-head{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-bottom:.4rem;padding-right:2.6rem}
 .sheet-head h2{font-size:1.3rem;font-weight:750;letter-spacing:-.025em}
 .x{
@@ -876,14 +990,22 @@ footer{
 
 /* ================= RESPONSIVE ================= */
 @media (max-width:1100px){
+  /* Floating drawer on the right rather than a full-page takeover. Closed state is
+     translated off-canvas AND visibility:hidden, so its links leave the tab order. */
   .nav-links{
-    display:none;position:fixed;inset:0;z-index:999;
-    flex-direction:column;justify-content:center;gap:.4rem;
-    background:var(--bg);border:none;border-radius:0;padding:2rem;
+    display:flex;position:fixed;top:0;right:0;bottom:0;left:auto;z-index:1005;
+    width:min(320px,84vw);
+    flex-direction:column;justify-content:flex-start;align-items:stretch;gap:.25rem;
+    background:var(--bg-elev);border:none;border-left:1px solid var(--border);
+    border-radius:0;padding:calc(64px + 1.1rem) 1.1rem 1.5rem;
+    box-shadow:-20px 0 55px -20px rgba(0,0,0,.6);
+    overflow-y:auto;overscroll-behavior:contain;
+    transform:translateX(102%);visibility:hidden;
+    transition:transform 460ms var(--ease-expo),visibility 460ms;
   }
-  /* the menu appeared instantly before - fade the panel, cascade the links */
-  .nav-links.open{display:flex;animation:menuIn 420ms var(--ease-soft)}
-  @keyframes menuIn{from{opacity:0}to{opacity:1}}
+  .nav-links.open{transform:translateX(0);visibility:visible}
+  /* burger must stay above the scrim so a second tap closes the drawer */
+  .nav-right{z-index:1006}
   .nav-links.open a{animation:menuLinkIn 560ms var(--ease-expo) backwards}
   .nav-links.open a:nth-child(1){animation-delay:80ms}
   .nav-links.open a:nth-child(2){animation-delay:125ms}
@@ -893,22 +1015,34 @@ footer{
   .nav-links.open a:nth-child(6){animation-delay:305ms}
   .nav-links.open a:nth-child(7){animation-delay:350ms}
   .nav-links.open a:nth-child(8){animation-delay:395ms}
-  @keyframes menuLinkIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-  .nav-links a{font-size:1.28rem;padding:.85rem 2rem;width:min(320px,86%);text-align:center}
+  @keyframes menuLinkIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+  .nav-links a{font-size:1rem;padding:.78rem 1rem;width:100%;text-align:left;border-radius:var(--r-sm)}
+  .nav-links a[aria-current="true"]{border-radius:var(--r-sm)}
   #burger{display:grid}
   .nav-cta{display:none}
 }
+/* scrim behind the drawer - tapping it closes the menu */
+.navscrim{
+  position:fixed;inset:0;z-index:1004;background:rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  opacity:0;visibility:hidden;
+  transition:opacity 380ms var(--ease-soft),visibility 380ms var(--ease-soft);
+}
+.navscrim.open{opacity:1;visibility:visible}
+@media (min-width:1101px){.navscrim{display:none}}
 @media (max-width:900px){
   .b-intro{grid-column:1/13}
   .b-photo{grid-column:1/13;grid-row:auto;min-height:min(62vh,420px)}
   .b-stats{grid-column:1/13;grid-template-columns:repeat(2,1fr)}
   .dom-grid{grid-template-columns:1fr}
+  .cred-grid{grid-template-columns:1fr 1fr}
   .cred--hero{grid-column:1/-1}
   .ct-grid{grid-template-columns:1fr}
   .f-top{grid-template-columns:1fr;gap:2rem}
 }
 @media (max-width:560px){
   .hero{padding-top:6rem}
+  .cred-grid{grid-template-columns:1fr}
   .cred--hero{flex-direction:column;align-items:flex-start;text-align:left}
   .tl-head{flex-direction:column}
   .tl-meta{align-items:flex-start;text-align:left;flex-direction:row;flex-wrap:wrap}
@@ -927,11 +1061,11 @@ footer{
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none}
-  .caret{display:none}
+  .marquee-track{animation:none!important}
 }
 
 @media print{
-  .grid-bg,nav,.progress,.fab,.scrim,.sheet,#toasts,.filters,.b-term,.hero-actions,form.contact,.socials{display:none!important}
+  .grid-bg,nav,.progress,.fab,.scrim,.sheet,#toasts,.filters,.hero-actions,form.contact,.socials{display:none!important}
   body{background:#fff;color:#000;font-size:11pt}
   section{padding-block:1rem;break-inside:avoid}
   .card,.proj,.cred,.skill,.tl-head,.tl-body{border-color:#bbb!important;background:#fff!important;box-shadow:none!important}
@@ -942,6 +1076,7 @@ footer{
 </head>
 <body>
 <div class="grid-bg" aria-hidden="true"></div>
+<div class="navscrim" id="navscrim"></div>
 <a class="skip" href="#main">Skip to content</a>
 <div class="progress" id="progress" aria-hidden="true"></div>
 <div id="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
@@ -993,16 +1128,14 @@ footer{
     <div class="bento">
 
       <div class="card b-intro rv">
-        <span class="avail"><span class="pulse"></span> Available to talk</span>
-        <p class="eyebrow">// Senior SQA Analyst &middot; Automation Engineer</p>
+        <p class="hero-meta">// Senior SQA Analyst &middot; Automation Engineer</p>
         <h1>Abu&nbsp;Asif</h1>
         <p class="hero-tag">Quality engineering for systems that <em>can't fail.</em></p>
         <p class="hero-body">
-          ISTQB CTFL v4.0 certified, <strong>6+ years</strong> across web, mobile and desktop.
+          ISTQB CTFL v4.0 certified, <strong data-exp="plus">6+ years</strong> across web, mobile and desktop.
           I test and automate <strong>US healthcare claims</strong> pipelines - Medicare, Medicaid,
-          EDGE, HIPAA - validate them down to the database on <strong>SQL Server, RDS and Redshift</strong>,
-          and wire the whole thing into CI/CD. Currently QA Analyst at Mercury IT (Veradigm)
-          and Scrum Master inside SAFe.
+          EDGE, HIPAA - and validate them down to the database on <strong>SQL Server, RDS and Redshift</strong>.
+          Currently QA Analyst at Mercury IT (Veradigm) and Scrum Master inside SAFe.
         </p>
         <div class="hero-actions">
           <a href="#projects" class="btn btn--primary">
@@ -1030,30 +1163,55 @@ footer{
              alt="Abu Asif, Senior SQA Analyst and Automation Engineer">
         <div class="photo-tag">
           <span class="chip chip--signal">Dhaka, BD &middot; UTC+6</span>
-          <span class="chip">Remote for US teams</span>
         </div>
       </div>
 
       <div class="b-stats rv">
-        <div class="card stat"><span class="num" data-count="6" data-suffix="+">0</span><span class="lbl">Years<br>experience</span></div>
+        <div class="card stat"><span class="num" data-count="6" data-suffix="+" data-exp-stat>0</span><span class="lbl">Years<br>experience</span></div>
         <div class="card stat"><span class="num" data-count="9">0</span><span class="lbl">Products<br>shipped</span></div>
         <div class="card stat stat--signal"><span class="num" data-count="85" data-suffix="%">0</span><span class="lbl">ISTQB<br>CTFL v4.0</span></div>
         <div class="card stat stat--amber"><span class="num" data-count="9" data-prefix="#">0</span><span class="lbl">SQA CTF 2026<br>of 79 entrants</span></div>
       </div>
 
-      <div class="card b-term rv" aria-hidden="true">
-        <div class="term-bar">
-          <span class="term-dot" style="background:var(--rose)"></span>
-          <span class="term-dot" style="background:var(--amber)"></span>
-          <span class="term-dot" style="background:var(--signal)"></span>
-          <span class="term-title">abu@qa-console - claims regression</span>
-        </div>
-        <div class="term-body" id="term"></div>
-      </div>
-
     </div>
   </div>
 </section>
+
+<!-- ============================ SKILLS TICKER ============================ -->
+<!-- Decorative: the real, readable skill list is section 06. Hidden from assistive
+     tech so it isn't read out twice. Both sets must stay identical for the loop. -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-set">
+      <span>Playwright</span><span class="sep">&#9670;</span>
+      <span>Selenium BDD</span><span class="sep">&#9670;</span>
+      <span>Cucumber</span><span class="sep">&#9670;</span>
+      <span>Python</span><span class="sep">&#9670;</span>
+      <span>Java</span><span class="sep">&#9670;</span>
+      <span>API Testing</span><span class="sep">&#9670;</span>
+      <span>SQL &amp; Redshift</span><span class="sep">&#9670;</span>
+      <span>EDI 837</span><span class="sep">&#9670;</span>
+      <span>JMeter</span><span class="sep">&#9670;</span>
+      <span>CI/CD</span><span class="sep">&#9670;</span>
+      <span>Risk-Based Testing</span><span class="sep">&#9670;</span>
+      <span>AI-Augmented QA</span><span class="sep">&#9670;</span>
+    </div>
+    <div class="marquee-set">
+      <span>Playwright</span><span class="sep">&#9670;</span>
+      <span>Selenium BDD</span><span class="sep">&#9670;</span>
+      <span>Cucumber</span><span class="sep">&#9670;</span>
+      <span>Python</span><span class="sep">&#9670;</span>
+      <span>Java</span><span class="sep">&#9670;</span>
+      <span>API Testing</span><span class="sep">&#9670;</span>
+      <span>SQL &amp; Redshift</span><span class="sep">&#9670;</span>
+      <span>EDI 837</span><span class="sep">&#9670;</span>
+      <span>JMeter</span><span class="sep">&#9670;</span>
+      <span>CI/CD</span><span class="sep">&#9670;</span>
+      <span>Risk-Based Testing</span><span class="sep">&#9670;</span>
+      <span>AI-Augmented QA</span><span class="sep">&#9670;</span>
+    </div>
+  </div>
+</div>
 
 <!-- ============================ EXPERTISE ============================ -->
 <div class="band">
@@ -1210,7 +1368,7 @@ footer{
     <div class="sec-head rv">
       <div class="idx mono">03 / EXPERIENCE</div>
       <h2>Professional <span class="accent">journey</span></h2>
-      <p>Six years of QA ownership - from sole tester on a project to Scrum Master inside a Scaled Agile programme.</p>
+      <p><span data-exp="word">Six years</span> of QA ownership - from sole tester on a project to Scrum Master inside a Scaled Agile programme.</p>
     </div>
 
     <div class="tl">
@@ -1219,7 +1377,7 @@ footer{
           <div>
             <h3>Quality Assurance Analyst</h3>
             <div class="co">Mercury IT (Veradigm)</div>
-            <div class="loc">Dhaka on-site &middot; remote for US client</div>
+            <div class="loc">Dhaka on-site</div>
           </div>
           <div class="tl-meta">
             <span class="tl-date">Jul 2024 - Present</span>
@@ -1642,9 +1800,9 @@ footer{
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="Read the detail">
+          <button class="disclose" aria-haspopup="dialog" data-label="Read the detail">
             <span class="disclose-label">Read the detail</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
         </div>
 
@@ -1681,44 +1839,104 @@ footer{
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
           </div>
           <div>
-            <h3>Selenium Web/UI automation, BDD framework</h3>
-            <div class="k">Published portfolio piece &middot; Upwork</div>
+            <h3>My Selenium BDD automation framework</h3>
+            <div class="k">Architecture sample &middot; one shared driver</div>
           </div>
         </div>
 
-        <p class="proof-claim">A UI suite a team can actually maintain, not just run once.</p>
+        <p class="proof-claim">One framework, reused across projects - not a script rewritten each time.</p>
 
         <div class="result-strip">
-          <span>features</span><span class="sep">&rarr;</span><span>step defs</span><span class="sep">&rarr;</span><span>page objects</span>
-          <span class="sep">&middot;</span><span>selectors in <b>one place</b></span>
+          <span>Runner</span><span class="sep">&rarr;</span><span>feature</span><span class="sep">&rarr;</span>
+          <span>StepDef</span><span class="sep">&rarr;</span><span>Page</span><span class="sep">&rarr;</span><span>Base</span>
+          <span class="sep">&middot;</span><span class="tick">&#10003;</span><b>single WebDriver</b>
         </div>
 
         <div class="proof-stack">
-          <span class="chip chip--sky">Selenium</span><span class="chip chip--sky">Cucumber BDD</span><span class="chip">TestNG</span><span class="chip">Maven</span><span class="chip">Jenkins</span>
+          <span class="chip chip--sky">Java Selenium</span><span class="chip chip--sky">Cucumber</span><span class="chip chip--sky">POM</span><span class="chip">JUnit</span><span class="chip">Maven</span><span class="chip">PageFactory</span>
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="Read the detail">
-            <span class="disclose-label">Read the detail</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          <button class="disclose" aria-haspopup="dialog" data-label="View the architecture">
+            <span class="disclose-label">View the architecture</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
         </div>
 
         <div class="proof-detail">
-          <dl>
-            <div>
-              <dt>Structure</dt>
-              <dd>Gherkin features a non-tester can read, thin step definitions, page objects holding the selectors. Driven by <strong>Java Selenium</strong> with TestNG and Maven, so a UI change is a one-file fix.</dd>
+          <p style="font-size:.865rem;color:var(--dim);line-height:1.6;margin-bottom:.9rem">
+            The same layered structure runs three of my public projects unchanged - a JuiceShop
+            suite, a nopCommerce task and a data-collection tool. Swap the feature files and the
+            page objects; the framework underneath doesn't move.
+          </p>
+
+          <div class="doc">
+            <div class="doc-bar">
+              <span class="chip chip--sky">Folder structure</span>
+              <span>Maven layout</span>
             </div>
-            <div>
-              <dt>Coverage strategy</dt>
-              <dd>Stable high-risk paths automated for regression; exploratory time reserved for what changed. Every escaped defect earns a permanent scenario.</dd>
+            <div class="doc-body">
+<pre style="margin:0;font-size:.735rem;line-height:1.85;color:var(--dim);white-space:pre;overflow-x:auto">pom.xml
+src/test/
+├── features/                 <span style="color:var(--signal)"># Gherkin, numbered by run order</span>
+│   ├── 1_Login.feature
+│   ├── 2_Order.feature
+│   └── 3_Search.feature
+└── java/
+    ├── RunnerObject/
+    │   └── Runner.java       <span style="color:var(--signal)"># entry point, Cucumber options</span>
+    ├── framework/
+    │   ├── ParentDriver.java <span style="color:var(--signal)"># the single WebDriver</span>
+    │   ├── ParentScenario.java
+    │   └── Constants.java    <span style="color:var(--signal)"># every URL + XPath</span>
+    ├── pages/                <span style="color:var(--signal)"># Page Object Model</span>
+    │   ├── BasePage.java
+    │   ├── LoginPage.java
+    │   └── OrderPage.java
+    └── test/
+        ├── LoginStepDef.java <span style="color:var(--signal)"># glue</span>
+        └── OrderStepDef.java
+target/reports/               <span style="color:var(--signal)"># html + JSON + JUnit XML</span></pre>
             </div>
-            <div>
-              <dt>Pipeline</dt>
-              <dd>Wired into <strong>Jenkins</strong> so regression runs on every build instead of the night before release.</dd>
+          </div>
+
+          <div class="doc" style="margin-top:.9rem">
+            <div class="doc-bar">
+              <span class="chip chip--sky">Execution flow</span>
+              <span>Runner to assertion</span>
             </div>
-          </dl>
+            <div class="doc-body">
+              <h4>1 &middot; Runner</h4>
+              <p><code>Runner.java</code> is annotated <code>@RunWith(Cucumber.class)</code> with <code>@CucumberOptions</code> pointing <code>features</code> at <code>src/test/features</code> and <code>glue</code> at the step-def package. It emits pretty, HTML, JSON and JUnit XML reports in one run. An <code>@AfterClass</code> teardown quits the browser exactly once.</p>
+
+              <h4>2 &middot; Gherkin feature</h4>
+              <p>Plain-language scenarios a non-tester can read and approve:</p>
+<pre style="margin:.3rem 0 0;font-size:.73rem;line-height:1.8;color:var(--dim);white-space:pre-wrap">Given browser is open
+Then go to the login page
+When user enters "&lt;email&gt;" and "&lt;password&gt;"
+And click on login button
+Then user is navigated to the home page</pre>
+              <p style="margin-top:.4rem">Data comes in as <code>{string}</code> parameters, so one scenario covers many datasets.</p>
+
+              <h4>3 &middot; Step definitions</h4>
+              <p>Every <code>*StepDef</code> class <strong>extends ParentScenario</strong>. Steps stay one line - they delegate straight to a page object and hold no selectors and no waits of their own. That's what keeps them readable.</p>
+
+              <h4>4 &middot; ParentScenario</h4>
+              <p>Extends <code>ParentDriver</code>, calls <code>getDriver()</code> once, and constructs every page object as a public field. Because each step-def inherits from it, they all share <em>the same driver and the same page instances</em> - no re-instantiation, no second browser.</p>
+
+              <h4>5 &middot; ParentDriver - the shared driver</h4>
+              <p>Holds a <code>static WebDriver</code> behind a lazy guard: <code>if (driver == null)</code> build it, otherwise hand back the existing one. Detects the host OS and configures ChromeOptions per platform (<code>--start-maximized</code>, <code>--remote-allow-origins=*</code>, 20s implicit wait). <strong>One browser for the whole suite</strong>, created on first use and quit by the Runner.</p>
+
+              <h4>6 &middot; Page Object Model</h4>
+              <p><code>BasePage</code> takes the driver, runs <code>PageFactory.initElements</code>, and owns the shared <code>WebDriverWait</code> (30s) plus an <code>Actions</code> instance. Every page extends it, so <code>LoginPage</code> inherits the waits and helpers and only declares its own <code>@FindBy</code> elements and behaviour methods.</p>
+
+              <h4>7 &middot; Constants</h4>
+              <p>All URLs and XPaths are <code>public static final String</code> in one file, referenced as <code>@FindBy(xpath = Constants.LOGIN_BUTTON)</code>. A UI change is a one-line edit in one file, never a hunt through step definitions.</p>
+
+              <h4>Why it's built this way</h4>
+              <p>The layering exists so each concern has exactly one home: Gherkin owns intent, step defs own translation, pages own interaction, Constants owns selectors, ParentDriver owns lifecycle. That's what makes the framework portable between projects instead of disposable.</p>
+            </div>
+          </div>
         </div>
       </article>
 
@@ -1746,9 +1964,9 @@ footer{
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="What's in there">
+          <button class="disclose" aria-haspopup="dialog" data-label="What's in there">
             <span class="disclose-label">What's in there</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
         </div>
 
@@ -1796,9 +2014,9 @@ footer{
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="Read the case study">
+          <button class="disclose" aria-haspopup="dialog" data-label="Read the case study">
             <span class="disclose-label">Read the case study</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
           <a class="ext" href="assets/artifacts/Abu-Asif-Test-Case-Template.xlsx" download>Template .xlsx</a>
         </div>
@@ -1876,9 +2094,9 @@ footer{
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="Read a full sample">
+          <button class="disclose" aria-haspopup="dialog" data-label="Read a full sample">
             <span class="disclose-label">Read a full sample</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
         </div>
 
@@ -1968,9 +2186,9 @@ footer{
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="Read the detail">
+          <button class="disclose" aria-haspopup="dialog" data-label="Read the detail">
             <span class="disclose-label">Read the detail</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
         </div>
 
@@ -2022,9 +2240,9 @@ footer{
         </div>
 
         <div class="proof-foot">
-          <button class="disclose" aria-expanded="false" data-label="Read the detail">
+          <button class="disclose" aria-haspopup="dialog" data-label="Read the detail">
             <span class="disclose-label">Read the detail</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
         </div>
 
@@ -2238,19 +2456,19 @@ footer{
         <div class="ct-list">
           <a class="ct-row" href="mailto:aa.asifabu@gmail.com">
             <span class="ct-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></span>
-            <span><span class="k">Email</span><span class="v">aa.asifabu@gmail.com</span></span>
+            <span class="ct-text"><span class="k">Email</span><span class="v">aa.asifabu@gmail.com</span></span>
           </a>
           <a class="ct-row" href="tel:+8801780963777">
             <span class="ct-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-            <span><span class="k">Phone</span><span class="v">+880 1780 963777</span></span>
+            <span class="ct-text"><span class="k">Phone</span><span class="v">+880 1780 963777</span></span>
           </a>
           <div class="ct-row">
             <span class="ct-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            <span><span class="k">Based in</span><span class="v">Nikunja 2, Khilkhet, Dhaka - Bangladesh</span></span>
+            <span class="ct-text"><span class="k">Based in</span><span class="v">Dhaka, Bangladesh</span></span>
           </div>
           <div class="ct-row">
             <span class="ct-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-            <span><span class="k">Timezone &middot; response</span><span class="v">UTC+6 - usually within 24h</span></span>
+            <span class="ct-text"><span class="k">My local time &middot; Dhaka</span><span class="v"><span id="localClock">--:--:-- </span><span style="color:var(--faint);font-weight:500">UTC+6</span></span></span>
           </div>
         </div>
 
@@ -2264,16 +2482,15 @@ footer{
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
             GitHub
           </a>
-          <a class="soc" href="assets/Abu-Asif-Resume-2026.pdf" download>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Résumé (PDF)
-          </a>
         </div>
       </div>
 
       <div class="card form-card rv">
-        <h3>Send a message</h3>
-        <p class="hint">Straight to my inbox. No newsletter, no follow-up sequence.</p>
+        <div class="form-head">
+          <h3>Send a message</h3>
+          <span class="reply-badge">reply ~24h</span>
+        </div>
+        <p class="hint">Straight to my inbox - no newsletter, no follow-up.</p>
         <form class="contact ajax" action="https://api.web3forms.com/submit" method="POST">
           <input type="hidden" name="access_key" value="a2ecb2a9-247a-415b-8cc1-67b291116fd3">
           <input type="hidden" name="subject" value="New enquiry from asifabu.github.io">
@@ -2286,7 +2503,7 @@ footer{
             <label for="cMail">Email</label>
             <input id="cMail" type="email" name="email" required autocomplete="email" placeholder="jane@company.com">
           </div>
-          <div class="field">
+          <div class="field field--grow">
             <label for="cMsg">Message</label>
             <textarea id="cMsg" name="message" required placeholder="What are you building, and what's at stake if it breaks?"></textarea>
           </div>
@@ -2294,7 +2511,6 @@ footer{
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Send message
           </button>
-          <p class="form-note">// typical reply time ~24h</p>
         </form>
       </div>
     </div>
@@ -2372,6 +2588,21 @@ footer{
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
 </button>
 
+<!-- ============================ DETAIL DIALOG ============================ -->
+<div class="mscrim" id="mscrim"></div>
+<div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+  <div class="modal-head">
+    <div class="modal-head-txt">
+      <span class="modal-kicker" id="modalKicker"></span>
+      <h2 id="modalTitle"></h2>
+    </div>
+    <button class="modal-x" id="modalClose" aria-label="Close details">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
 <!-- ============================ CONTACT SHEET ============================ -->
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1">
@@ -2413,7 +2644,7 @@ footer{
 
     <div style="display:flex;align-items:center;gap:9px;margin-bottom:1.1rem;font-size:.83rem;color:var(--dim)">
       <span class="pulse"></span>
-      <strong style="color:var(--text)">Available to talk</strong>
+      <strong style="color:var(--text)">Open to new work</strong>
       <span class="mono" style="font-size:.72rem;color:var(--faint)">&middot; UTC+6 &middot; ~24h</span>
     </div>
 
@@ -2504,6 +2735,17 @@ footer{
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  /* declared up here because both the detail dialog and the contact sheet trap focus */
+  var FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+  /* shared focus trap for any open dialog */
+  function trapFocus(e, container) {
+    var items = $$(FOCUSABLE, container).filter(function (el) { return el.offsetParent !== null; });
+    if (!items.length) return;
+    var first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 
   /* ---------------- theme ---------------- */
   var SUN  = '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
@@ -2558,14 +2800,17 @@ footer{
   var BURGER_OPEN = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   var BURGER_SHUT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
 
+  var navscrim = $('#navscrim');
   function setMenu(open) {
     links.classList.toggle('open', open);
+    navscrim.classList.toggle('open', open);
     burger.innerHTML = open ? BURGER_OPEN : BURGER_SHUT;
     burger.setAttribute('aria-expanded', String(open));
     burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     document.body.style.overflow = open ? 'hidden' : '';
   }
   burger.addEventListener('click', function () { setMenu(!links.classList.contains('open')); });
+  navscrim.addEventListener('click', function () { setMenu(false); });
   $$('#navlinks a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
 
   /* ---------------- scroll: nav state + progress + fab ---------------- */
@@ -2669,6 +2914,58 @@ footer{
   });
   var yr = $('#yr'); if (yr) yr.textContent = String(new Date().getFullYear());
 
+  /* ---------------- live local clock (Dhaka = UTC+6, no DST) ----------------
+     Derived from the visitor's own clock shifted to UTC+6, so it's correct wherever
+     they are and needs no timezone library. */
+  var clockEl = $('#localClock');
+  if (clockEl) {
+    var pad = function (n) { return n < 10 ? '0' + n : String(n); };
+    var tick = function () {
+      var now = new Date();
+      var dhaka = new Date(now.getTime() + (now.getTimezoneOffset() + 360) * 60000);
+      var h = dhaka.getHours(), ampm = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12;
+      clockEl.textContent = h12 + ':' + pad(dhaka.getMinutes()) + ':' + pad(dhaka.getSeconds()) + ' ' + ampm + ' ';
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  /* ---------------- total experience, computed from one anchor ----------------
+     CAREER_START is the SQA internship at NYK Advance, which is what the résumé's
+     "6+ years" counts from. Change this one date and every mention updates:
+     the hero stat, the hero paragraph, the Experience subhead, the meta
+     description and the JSON-LD. Nothing to bump by hand each January.        */
+  var CAREER_START = '2020-01-01';
+  var expMonths = monthsBetween(new Date(CAREER_START), new Date());
+  var expYears = Math.max(1, Math.floor(expMonths / 12));
+  var WORDS = ['zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight',
+               'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
+               'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+  var expWord = WORDS[expYears] || String(expYears);
+
+  $$('[data-exp="plus"]').forEach(function (el) { el.textContent = expYears + '+ years'; });
+  $$('[data-exp="word"]').forEach(function (el) { el.textContent = expWord + ' years'; });
+
+  /* the hero counter reads data-count when it animates, and that runs after this */
+  var expStat = $('[data-count][data-exp-stat]');
+  if (expStat) expStat.setAttribute('data-count', String(expYears));
+
+  /* Keep the crawler-facing copy in step too. Google renders JS, so this stays
+     accurate; the static values in the source remain correct as a fallback. */
+  (function () {
+    var re = /\b\d+\+ years\b/g, repl = expYears + '+ years';
+    var meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute('content', meta.getAttribute('content').replace(re, repl));
+    var ld = document.querySelector('script[type="application/ld+json"]');
+    if (ld) {
+      try {
+        var data = JSON.parse(ld.textContent);
+        if (data.description) { data.description = data.description.replace(re, repl); }
+        ld.textContent = JSON.stringify(data, null, 2);
+      } catch (e) { /* leave the static JSON-LD alone if it ever fails to parse */ }
+    }
+  })();
+
   /* ---------------- stat counters ---------------- */
   function countUp(el) {
     var target = parseInt(el.getAttribute('data-count'), 10) || 0;
@@ -2723,49 +3020,6 @@ footer{
     } else { fillRing(); }
   }
 
-  /* ---------------- hero terminal ---------------- */
-  var term = $('#term');
-  if (term) {
-    var LINES = [
-      { c: 'l', t: '<span class="c">$</span> <span class="k">pytest</span> tests/claims --edi=837 --env=qa2' },
-      { c: 'l', t: '<span class="c">collected 9 items</span>' },
-      { c: 'l', t: '<span class="p">PASS</span>  837P &middot; professional claim intake' },
-      { c: 'l', t: '<span class="p">PASS</span>  837I &middot; institutional claim intake' },
-      { c: 'l', t: '<span class="p">PASS</span>  COB &middot; secondary payer order resolution' },
-      { c: 'l', t: '<span class="p">PASS</span>  277CA &middot; response file generation' },
-      { c: 'l', t: '<span class="p">PASS</span>  redshift &middot; claim-to-warehouse reconciliation' },
-      { c: 'l', t: '<span class="ok">9 passed</span> <span class="c">in 2.41s</span>' }
-    ];
-    function renderAll() {
-      term.innerHTML = LINES.map(function (l) { return '<span class="l">' + l.t + '</span>'; }).join('');
-    }
-    if (reduce) {
-      renderAll();
-    } else {
-      var started = false;
-      function play() {
-        if (started) return;
-        started = true;
-        var i = 0;
-        term.innerHTML = '<span class="l"><span class="caret"></span></span>';
-        (function next() {
-          /* the previous render already appended the trailing caret - don't add a second */
-          if (i >= LINES.length) return;
-          var html = LINES.slice(0, i + 1).map(function (l) { return '<span class="l">' + l.t + '</span>'; }).join('');
-          term.innerHTML = html + '<span class="l"><span class="caret"></span></span>';
-          i++;
-          setTimeout(next, i === 1 ? 620 : 340);
-        })();
-      }
-      if ('IntersectionObserver' in window) {
-        var tObs = new IntersectionObserver(function (entries) {
-          entries.forEach(function (en) { if (en.isIntersecting) { play(); tObs.unobserve(en.target); } });
-        }, { threshold: 0.3 });
-        tObs.observe(term);
-      } else { renderAll(); }
-    }
-  }
-
   /* ---------------- project filter ---------------- */
   var filters = $$('.filter'), cards = $$('#projGrid .proj'), emptyNote = $('#emptyNote');
   filters.forEach(function (btn) {
@@ -2782,27 +3036,74 @@ footer{
     });
   });
 
-  /* ---------------- detail disclosure (tap-friendly) ----------------
-     One handler for both project cards and proof-of-work cards. Proof cards also
-     toggle .is-open on the card so a document card can widen to the full row. */
-  $$('.disclose').forEach(function (btn) {
-    var proofCard = btn.closest('.proof');
-    var scope = btn.closest('.proj-body') || proofCard;
-    if (!scope) return;
-    var panel = scope.querySelector('.proj-detail') || scope.querySelector('.proof-detail');
+  /* ---------------- project card disclosure (expands in place) ----------------
+     Project detail is 2-4 short bullets, so inline expansion is the right weight.
+     The button gets a real expanded state via [aria-expanded="true"] in CSS.      */
+  $$('#projGrid .disclose').forEach(function (btn) {
+    var panel = btn.closest('.proj-body').querySelector('.proj-detail');
     if (!panel) return;
-
-    var label = btn.querySelector('.disclose-label');
-    var openText = btn.getAttribute('data-label') || (label ? label.textContent : '');
-
     btn.addEventListener('click', function () {
       var open = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!open));
       if (open) panel.removeAttribute('data-open'); else panel.setAttribute('data-open', '');
-      if (proofCard) proofCard.classList.toggle('is-open', !open);
-      if (label) label.textContent = open ? openText : 'Hide detail';
     });
   });
+
+  /* ---------------- proof-of-work detail dialog ----------------
+     Proof detail is long-form, so it opens in a dialog instead of shoving every
+     card below it down the page. The panel node is MOVED into the dialog and moved
+     back on close, so the markup is never duplicated and stays in the card for
+     crawlers and for no-JS visitors.                                             */
+  var mscrim = $('#mscrim'), modal = $('#detailModal'), modalBody = $('#modalBody');
+  var modalTitle = $('#modalTitle'), modalKicker = $('#modalKicker'), modalClose = $('#modalClose');
+  var movedPanel = null, panelHome = null, modalReturn = null, modalLastFocus = null;
+
+  function modalIsOpen() { return modal.classList.contains('open'); }
+
+  function openDetail(card) {
+    var panel = card.querySelector('.proof-detail');
+    if (!panel || modalIsOpen()) return;
+    clearTimeout(modalReturn);
+
+    var h = card.querySelector('.proof-top h3');
+    var k = card.querySelector('.proof-top .k');
+    modalTitle.textContent = h ? h.textContent.trim() : 'Detail';
+    modalKicker.textContent = k ? k.textContent.trim() : '';
+
+    movedPanel = panel;
+    panelHome = panel.parentNode;
+    modalBody.appendChild(panel);
+    panel.setAttribute('data-open', '');
+
+    modalLastFocus = document.activeElement;
+    mscrim.classList.add('open');
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    modalBody.scrollTop = 0;
+    setTimeout(function () { (modal.querySelector(FOCUSABLE) || modal).focus(); }, 140);
+  }
+
+  function closeDetail() {
+    if (!modalIsOpen()) return;
+    mscrim.classList.remove('open');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    if (modalLastFocus && modalLastFocus.focus) modalLastFocus.focus();
+    /* put the panel back only after the close animation, or it vanishes mid-flight */
+    modalReturn = setTimeout(function () {
+      if (movedPanel && panelHome) {
+        movedPanel.removeAttribute('data-open');
+        panelHome.appendChild(movedPanel);
+      }
+      movedPanel = null; panelHome = null;
+    }, reduce ? 0 : 460);
+  }
+
+  $$('.proof .disclose').forEach(function (btn) {
+    btn.addEventListener('click', function () { openDetail(btn.closest('.proof')); });
+  });
+  modalClose.addEventListener('click', closeDetail);
+  mscrim.addEventListener('click', closeDetail);
 
   /* ---------------- toast ---------------- */
   var toasts = $('#toasts');
@@ -2866,7 +3167,6 @@ footer{
   /* ---------------- accessible bottom sheet ---------------- */
   var scrim = $('#scrim'), sheet = $('#sheet'), openBtn = $('#openSheet'), closeBtn = $('#closeSheet');
   var lastFocus = null;
-  var FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
   function openSheet() {
     lastFocus = document.activeElement;
@@ -2902,16 +3202,15 @@ footer{
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      /* topmost layer first: detail dialog sits above the contact sheet */
+      if (modalIsOpen()) { closeDetail(); return; }
       if (sheetOpen()) { closeSheet(); return; }
       if (links.classList.contains('open')) setMenu(false);
       return;
     }
-    if (e.key === 'Tab' && sheetOpen()) {
-      var items = $$(FOCUSABLE, sheet).filter(function (el) { return el.offsetParent !== null; });
-      if (!items.length) return;
-      var first = items[0], last = items[items.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    if (e.key === 'Tab') {
+      if (modalIsOpen()) { trapFocus(e, modal); return; }
+      if (sheetOpen()) { trapFocus(e, sheet); }
     }
   });
 
