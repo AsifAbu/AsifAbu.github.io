@@ -464,11 +464,9 @@ nav.scrolled::before{
 .rank span{font-size:.82rem;font-weight:500;color:var(--faint)}
 
 /* ================= EXPERIENCE ================= */
-/* Experience is centred in the wide canvas (its own request) so the 900px timeline
-   doesn't hug the left with a big empty right gutter. Header centres to match. */
-.tl{max-width:900px;margin-inline:auto;position:relative;padding-left:clamp(1.6rem,4vw,2.4rem)}
-#experience .sec-head{margin-inline:auto;text-align:center;max-width:640px}
-#experience .sec-head .idx{justify-content:center}
+/* No max-width cap: the timeline fills the full content width like every other
+   section, and the header is left-aligned to match them. */
+.tl{position:relative;padding-left:clamp(1.6rem,4vw,2.4rem)}
 .tl::before{content:'';position:absolute;left:5px;top:.6rem;bottom:.6rem;width:1px;background:var(--border)}
 .tl-item{position:relative;margin-bottom:clamp(1.6rem,4vw,2.4rem)}
 .tl-item:last-child{margin-bottom:0}
