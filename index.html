@@ -31,7 +31,7 @@
 <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)">
 
 <!-- Inline SVG favicon: no extra request, works in both themes -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0c10'/%3E%3Cpath d='M12 46 22 18h6l10 28h-6.4l-2-6H20.4l-2 6H12zm10-11h6l-3-9.2zM42 46V18h6v28z' fill='%2334d399'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0c10'/%3E%3Cpath d='M11 46 20 16 29 46 M14.5 37 25.5 37 M35 46 44 16 53 46 M38.5 37 49.5 37' fill='none' stroke='%2334d399' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="assets/avatar-384.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -988,40 +988,43 @@ footer{
 
 /* ================= RESPONSIVE ================= */
 @media (max-width:1100px){
-  /* Floating drawer on the right rather than a full-page takeover. Closed state is
-     translated off-canvas AND visibility:hidden, so its links leave the tab order. */
+  /* Menu is a content-sized card that floats just BELOW the 70px header bar,
+     right-aligned under the burger. It drops in from under the header (not from the
+     very top of the page) and is only as wide/tall as its links need. */
   .nav-links{
-    display:flex;position:fixed;top:0;right:0;bottom:0;left:auto;z-index:1005;
-    width:min(320px,84vw);
-    flex-direction:column;justify-content:flex-start;align-items:stretch;gap:.25rem;
-    background:var(--bg-elev);border:none;border-left:1px solid var(--border);
-    border-radius:0;padding:calc(64px + 1.1rem) 1.1rem 1.5rem;
-    box-shadow:-20px 0 55px -20px rgba(0,0,0,.6);
-    overflow-y:auto;overscroll-behavior:contain;
-    transform:translateX(102%);visibility:hidden;
-    transition:transform 460ms var(--ease-expo),visibility 460ms;
+    display:flex;position:fixed;top:70px;right:0;left:auto;z-index:1005;
+    width:max-content;min-width:210px;max-width:calc(100vw - var(--gut));
+    flex-direction:column;align-items:stretch;gap:2px;
+    background:var(--bg-elev);border:1px solid var(--border-strong);border-right:none;border-top:none;
+    /* tucked into the top-right corner: flush to the header bar (top) and the right
+       edge, so only the bottom-left corner is rounded */
+    border-radius:0 0 0 var(--r-lg);padding:.5rem;
+    box-shadow:0 24px 50px -16px rgba(0,0,0,.6);
+    max-height:calc(100dvh - 70px);overflow-y:auto;overscroll-behavior:contain;
+    transform:translateY(-14px);opacity:0;visibility:hidden;
+    transition:transform 340ms var(--ease-expo),opacity 300ms var(--ease-soft),visibility 340ms;
   }
-  .nav-links.open{transform:translateX(0);visibility:visible}
-  /* burger must stay above the scrim so a second tap closes the drawer */
+  .nav-links.open{transform:translateY(0);opacity:1;visibility:visible}
+  /* once settled, drop the transform so the text renders crisp (no GPU layer) */
+  .nav-links.settled{transform:none;transition:none}
+  /* solid header bar while the menu is open (it sits over the dimmed page) */
+  nav.menu-open::before{background:var(--bg-elev);-webkit-backdrop-filter:none;backdrop-filter:none}
   .nav-right{z-index:1006}
-  .nav-links.open a{animation:menuLinkIn 560ms var(--ease-expo) backwards}
-  .nav-links.open a:nth-child(1){animation-delay:80ms}
-  .nav-links.open a:nth-child(2){animation-delay:125ms}
-  .nav-links.open a:nth-child(3){animation-delay:170ms}
-  .nav-links.open a:nth-child(4){animation-delay:215ms}
-  .nav-links.open a:nth-child(5){animation-delay:260ms}
-  .nav-links.open a:nth-child(6){animation-delay:305ms}
-  .nav-links.open a:nth-child(7){animation-delay:350ms}
-  .nav-links.open a:nth-child(8){animation-delay:395ms}
-  @keyframes menuLinkIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
-  .nav-links a{font-size:1rem;padding:.78rem 1rem;width:100%;text-align:left;border-radius:var(--r-sm)}
-  .nav-links a[aria-current="true"]{border-radius:var(--r-sm)}
+  /* left-aligned list with hairline dividers */
+  .nav-links a{
+    font-size:.95rem;font-weight:600;padding:.7rem .85rem;width:100%;text-align:left;
+    border-radius:8px;border-bottom:1px solid var(--border);white-space:nowrap;
+  }
+  .nav-links a:last-child{border-bottom:none}
   #burger{display:grid}
   .nav-cta{display:none}
 }
 /* scrim behind the drawer - tapping it closes the menu */
+/* z-index MUST stay below nav (1000). The drawer lives inside <nav> (z:1000), so a
+   scrim above nav would paint over the drawer and its backdrop-filter would blur it.
+   At 999 the scrim dims/blurs the page behind it while the drawer stays crisp on top. */
 .navscrim{
-  position:fixed;inset:0;z-index:1004;background:rgba(0,0,0,.55);
+  position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.55);
   -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
   opacity:0;visibility:hidden;
   transition:opacity 380ms var(--ease-soft),visibility 380ms var(--ease-soft);
@@ -2799,13 +2802,24 @@ Then user is navigated to the home page</pre>
   var BURGER_SHUT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
 
   var navscrim = $('#navscrim');
+  var menuSettleTimer;
   function setMenu(open) {
+    clearTimeout(menuSettleTimer);
+    // drop the "settled" (transform:none) state before any slide so the animation runs
+    links.classList.remove('settled');
     links.classList.toggle('open', open);
     navscrim.classList.toggle('open', open);
+    nav.classList.toggle('menu-open', open);   // solid nav-bar bg while the panel is out
     burger.innerHTML = open ? BURGER_OPEN : BURGER_SHUT;
     burger.setAttribute('aria-expanded', String(open));
     burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     document.body.style.overflow = open ? 'hidden' : '';
+    // after the slide finishes, remove the transform so the panel text renders crisp
+    if (open && !reduce) {
+      menuSettleTimer = setTimeout(function () {
+        if (links.classList.contains('open')) links.classList.add('settled');
+      }, 540);
+    }
   }
   burger.addEventListener('click', function () { setMenu(!links.classList.contains('open')); });
   navscrim.addEventListener('click', function () { setMenu(false); });
